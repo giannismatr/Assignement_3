@@ -11,7 +11,7 @@ class AI(FanoronaPlayer):
     name = "Group XX"
 
     def __init__(self, color):
-        super(AI, self).__init__(color)
+        super(AI, self).__init__(self.name, color)
         self.position = color.value
 
     def play(self, state, remain_time):
