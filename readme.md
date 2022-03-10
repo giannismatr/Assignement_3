@@ -49,7 +49,7 @@ You can start the game by clicking ```Game > New Game``` (or ```Ctrl-N``` / ```C
 
 
 ### Allowed time for each AI
-The ```-t``` option allows you to specify the overall time allowed for all of you AI moves. After this time is exhausted all the next moves for the AI is done by a random agent.
+The ```-t``` option allows you to specify the overall time (in seconds) allowed for all AI moves of each agent. If an agent exceeds his budget, he automatically loses the game.
 
 **Example:**
 

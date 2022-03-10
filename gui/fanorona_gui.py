@@ -72,6 +72,8 @@ class FanoronaGUI(QMainWindow):
     def _reset(self):
 
         self.done = False
+        self.time_out = False
+        self.illegal_move = False
         self.rewarding_move = False
         self.board = BoardGUI(self.board_shape)
         self.board_gui.init_board(self.players) #
@@ -161,6 +163,8 @@ class FanoronaGUI(QMainWindow):
         self.board.reset_board()
         self.board.score = {-1: 0, 1: 0}
         self.done = False
+        self.time_out = False
+        self.illegal_move = False
 
         self.board.enable_all_squares()
         self.panel.reset_panel_player()
@@ -213,14 +217,22 @@ class FanoronaGUI(QMainWindow):
                 if self.step(action):
                     print('Action performed successfully by', turn, ' in', str(elapsed_time), ' rest ', remain_time)
                 else:
-                    print("An illegal move were given. Performing a random move")
-                    print(f"Lunching a random move for {turn}, and reward is {state.rewarding_move}")
+                    print("An illegal move were given. ", turn, "lost")
+                    #print(f"Lunching a random move for {turn}, and reward is {state.rewarding_move}")
                     action = FanoronaRules.random_play(state, turn)  # TODO: Should we use the original state?
+                    self.done = True
+                    self.illegal_move = True
+                    self.state.score[turn] = 0
+                    self.state.score[-turn] = 22
 
             else:
-                print("Not remain time for ", turn, " Performing a random move")
-                print(f"Lunching a random move for {turn}, and reward is {state.rewarding_move}")
+                print("Not remain time for ", turn, ", he lost")
+                #print(f"Lunching a random move for {turn}, and reward is {state.rewarding_move}")
                 action = FanoronaRules.random_play(state, turn)  # TODO: Should we use the original state?
+                self.done = True
+                self.time_out = True
+                self.state.score[turn] = 0
+                self.state.score[-turn] = 22
             self._update_gui()
             self.trace.add(self.state)
             self.players[turn].update_player_infos(self.get_player_info(turn))
@@ -268,9 +280,14 @@ class FanoronaGUI(QMainWindow):
             self.trace.done = self.done
             results = FanoronaRules.get_results(self.state)
             if not results['tie']:
-                end = QMessageBox.information(self, "End", f"{self.players[results['winner']].name} wins.")
+                if self.time_out:
+                    end = QMessageBox.information(self, "End", f"{self.players[results['winner']].name} wins (his opponent timed out).")
+                elif self.illegal_move:
+                    end = QMessageBox.information(self, "End", f"{self.players[results['winner']].name} wins (his opponent made an illegal move).")
+                else:
+                    end = QMessageBox.information(self, "End", f"{self.players[results['winner']].name} wins.")
             else:
-                end = QMessageBox.information(self, "End", "No winners.")
+                end = QMessageBox.information(self, "End", "No winner.")
 
     def load_battle(self, states, delay=0.5, done=True):
         hit = 0
