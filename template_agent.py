@@ -1,10 +1,7 @@
-
-
 from core.player import Color
 from fanorona.fanorona_player import FanoronaPlayer
 from fanorona.fanorona_rules import FanoronaRules
-from copy import deepcopy
-
+import copy
 
 class AI(FanoronaPlayer):
 
@@ -26,21 +23,33 @@ class AI(FanoronaPlayer):
     state s.
     """
     def successors(self, state):
-        pass  # TODO replace by your code
-
+        results=[]
+        actions = FanoronaRules.get_player_actions(state,self.color.value)
+        for x in range(0,len(actions)):
+            mycopy=copy.deepcopy(state)
+            mycopy=FanoronaRules.act(mycopy,actions[x],self.color.value)
+            results.append((actions[x],mycopy))
+            yield results
     """
     The cutoff function returns true if the alpha-beta/minimax
     search has to stop and false otherwise.
     """
     def cutoff(self, state, depth):
-        pass  # TODO replace by your code
+        if FanoronaRules.is_end_game(state):
+            return True
+        elif depth+1:
+            return True
+        return False  # TODO replace by your code
 
     """
     The evaluate function must return an integer value
     representing the utility function of the board.
     """
     def evaluate(self, state):
-        pass  # TODO replace by your code
+        score=state.score
+        myplayervalue=self.color.value
+        answer=score[myplayervalue]
+        return answer  # TODO replace by your code
 
 
 
